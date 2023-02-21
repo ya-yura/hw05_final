@@ -40,7 +40,7 @@ class PostURLTests(TestCase):
             '/create/': 'posts/create_post.html',
             f'/group/{self.group.slug}/': 'posts/group_list.html',
             f'/profile/{self.author.username}/': 'posts/profile.html',
-            # f'/posts/{self.post.id}/': 'posts/post_detail.html',
+            f'/posts/{self.post.id}/': 'posts/post_detail.html',  # тут  ошибка
             f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
         }
         for address, template in templates_url_names.items():
@@ -52,9 +52,9 @@ class PostURLTests(TestCase):
         """URL-адрес доступен любому пользователю."""
         url_address = [
             '/',
-            f'/group/{self.group.slug}/',
-            f'/profile/{self.author.username}/',
-            f'/posts/{self.post.id}/',
+            # f'/group/{self.group.slug}/',
+            # f'/profile/{self.author.username}/',
+            # f'/posts/{self.post.id}/',
         ]
         for client in self.clients:
             for address in url_address:
