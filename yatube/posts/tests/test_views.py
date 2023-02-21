@@ -66,10 +66,9 @@ class PostPagesTests(TestCase):
             reverse(
                 'posts:group_list', kwargs={'slug': f'{self.group.slug}'}
             ): 'posts/group_list.html',
-            # reverse(
-            #     'posts:profile', kwargs={
-            #           'username': f'{self.author.username}'}
-            # ): 'posts/profile.html',
+            reverse(
+                'posts:profile', kwargs={'username': f'{self.author.username}'}
+            ): 'posts/profile.html',
             # reverse(
             #     'posts:post_detail', kwargs={'post_id': f'{self.post.id}'}
             # ): 'posts/post_detail.html',
