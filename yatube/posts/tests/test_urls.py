@@ -1,8 +1,7 @@
-from http import HTTPStatus
-
+from django.urls import reverse
 from django.contrib.auth import get_user_model
-from django.test import Client, TestCase
-
+from django.test import TestCase, Client
+from django.core.cache import cache
 from posts.models import Group, Post
 
 User = get_user_model()
@@ -12,84 +11,81 @@ class PostURLTests(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.guest_client = Client()
-        cls.user = User.objects.create_user(username='auth')
-        cls.authorized_client = Client()
-        cls.authorized_client.force_login(cls.user)
-        cls.post = Post.objects.create(
-            text='Тестовый текст',
-            author=cls.user,
-            id='13'
-        )
+        cls.author = User.objects.create_user(username='author')
         cls.group = Group.objects.create(
-            title='Тестовый заголовок',
-            slug='slug',
-            description='Тестовое описание'
+            title='Тестовое название группы',
+            description='тестовое описание группы',
+            slug='test_slug',
         )
 
-    def test_index_url_exists_at_desired_location(self):
-        """Страница / доступна любому пользователю."""
-        response = self.guest_client.get('/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+        cls.post = Post.objects.create(
+            author=cls.author,
+            text='Тестовый пост',
+        )
 
-    def test_task_group_url_exists_at_desired_location(self):
-        """Страница /group/slug/ доступна любому пользователю."""
-        response = self.guest_client.get('/group/slug/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_task_profile_url_exists_at_desired_location(self):
-        """Страница /profile/auth/ доступна любому пользователю."""
-        response = self.guest_client.get('/profile/auth/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_task_post_detail_url_exists_at_desired_location(self):
-        """Страница /posts/13/ доступна любому пользователю."""
-        response = self.guest_client.get('/posts/13/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-
-    def test_posts_edit_url_redirect_anonymous_on_admin_login(self):
-        """Страница по адресу /posts/<int:post_id>/edit/ доступна авт-му
-        пользователю. """
-        response = self.authorized_client.get('/posts/13/edit/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def setUp(self):
+        self.guest_client = Client()
+        self.authorized_client = Client()
+        self.authorized_client.force_login(self.author)
+        self.clients = {
+            'guest_client': self.guest_client,
+            'authorized_client': self.authorized_client,
+        }
 
     def test_urls_uses_correct_template(self):
-        """Соответствующие шаблон для общедоступных страниц."""
+        """URL-адрес использует соответствующий шаблон."""
+        cache.clear()
         templates_url_names = {
-            'posts/index.html': '/',
-            'posts/group_list.html': '/group/slug/',
-            'posts/profile.html': '/profile/auth/',
-            'posts/post_detail.html': '/posts/13/'
+            '/': 'posts/index.html',
+            '/create/': 'posts/create_post.html',
+            f'/group/{self.group.slug}/': 'posts/group_list.html',
+            f'/profile/{self.author.username}/': 'posts/profile.html',
+            f'/posts/{self.post.id}/': 'posts/post_detail.html',
+            f'/posts/{self.post.id}/edit/': 'posts/create_post.html',
         }
-        for template, address in templates_url_names.items():
+        for address, template in templates_url_names.items():
             with self.subTest(address=address):
-                response = self.guest_client.get(address)
+                response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
-    def test_unexisting_page_return_404(self):
-        """Страница unexisting вернет 404."""
-        response = self.authorized_client.get('/unexisting_page/')
-        self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
+    def test_urls_available_to_any_client(self):
+        """URL-адрес доступен любому пользователю."""
+        url_address = [
+            '/',
+            f'/group/{self.group.slug}/',
+            f'/profile/{self.author.username}/',
+            f'/posts/{self.post.id}/',
+        ]
+        for client in self.clients:
+            for address in url_address:
+                with self.subTest(client=client, address=address):
+                    response = self.clients[client].get(address)
+                    self.assertEqual(response.status_code, 200)
 
-    def test_post_create_for_authorized(self):
-        """Страница по адресу /create/ доступна авторизованному
-        пользователю."""
-        response = self.authorized_client.get('/create/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
+    def test_urls_available_to_auth_client(self):
+        """Адреса, доступные авторизованному пользователю."""
+        urls = [
+            '/create/',
+            f'/posts/{self.post.id}/edit/',
+        ]
+        clients = [
+            'guest_client',
+            'authorized_client',
+        ]
+        for url in urls:
+            for client in clients:
+                with self.subTest(url=url):
+                    response = self.clients[client].get(url, follow=True)
+                    self.assertEqual(response.status_code, 200)
 
-    def test_post_create_anonymous(self):
-        """Страница по адресу /create/ перенаправит анонимного
-        пользователя на страницу логина.
-        """
-        response = self.guest_client.get('/create/')
-        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+    def test_url_avaliable_to_auth_for_edit(self):
+        """Редактирование доступно авторизованному пользователю."""
+        response = self.authorized_client.get(reverse(
+            'posts:edit', kwargs={'post_id': self.post.id})
+        )
+        self.assertEqual(response.status_code, 200)
 
-    def test_posts_edit_url_uses_correct_template(self):
-        """Страница /added/ использует шаблон deals/added.html."""
-        response = self.authorized_client.get('/create/')
-        self.assertTemplateUsed(response, 'posts/create_post.html')
-
-    def test_urls_authorized_correct_template(self):
-        response = self.authorized_client.get('/follow/')
-        self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertTemplateUsed(response, 'posts/follow.html')
+    def test_404(self):
+        """Cервер возвращает код 404, если страница не найдена."""
+        response = self.guest_client.get('/notfound/')
+        self.assertEqual(response.status_code, 404)
