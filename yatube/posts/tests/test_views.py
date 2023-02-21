@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client, override_settings
-# from django import forms
+from django import forms
 from posts.models import Group, Post, Follow
 from django.conf import settings
 from django.core.cache import cache
@@ -63,9 +63,9 @@ class PostPagesTests(TestCase):
         templates_url_address = {
             reverse('posts:index'): 'posts/index.html',
             reverse('posts:post_create'): 'posts/create_post.html',
-            # reverse(
-            #     'posts:group_list', kwargs={'slug': f'{self.group.slug}'}
-            # ): 'posts/group_list.html',
+            reverse(
+                'posts:group_list', kwargs={'slug': f'{self.group.slug}'}
+            ): 'posts/group_list.html',
             # reverse(
             #     'posts:profile', kwargs={
             #           'username': f'{self.author.username}'}
