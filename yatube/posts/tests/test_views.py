@@ -73,7 +73,7 @@ class PostPagesTests(TestCase):
                 'posts:post_detail', kwargs={'post_id': f'{self.post.id}'}
             ): 'posts/post_detail.html',
             reverse(
-                'posts:edit', kwargs={'post_id': f'{self.post.id}'}
+                'posts:post_edit', kwargs={'post_id': f'{self.post.id}'}
             ): 'posts/create_post.html',
         }
         for reverse_name, template in templates_url_address.items():
