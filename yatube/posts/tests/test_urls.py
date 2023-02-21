@@ -52,7 +52,7 @@ class PostURLTests(TestCase):
         """URL-адрес доступен любому пользователю."""
         url_address = [
             '/',
-            # f'/group/{self.group.slug}/',
+            f'/group/{self.group.slug}/',
             # f'/profile/{self.author.username}/',
             # f'/posts/{self.post.id}/',
         ]
