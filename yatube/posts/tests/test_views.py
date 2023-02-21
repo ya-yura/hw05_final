@@ -62,7 +62,7 @@ class PostPagesTests(TestCase):
         cache.clear()
         templates_url_address = {
             reverse('posts:index'): 'posts/index.html',
-            # reverse('posts:post_create'): 'posts/create_post.html',
+            reverse('posts:post_create'): 'posts/create_post.html',
             # reverse(
             #     'posts:group_list', kwargs={'slug': f'{self.group.slug}'}
             # ): 'posts/group_list.html',
@@ -82,17 +82,17 @@ class PostPagesTests(TestCase):
                 response = self.authorized_client.get(reverse_name)
                 self.assertTemplateUsed(response, template)
 
-#    def test_correct_context(self):
-#        response = self.authorized_client.get(reverse('posts:post_create'))
-#        form_fields = {
-#            'text': forms.fields.CharField,
-#            'group': forms.fields.ChoiceField,
-#        }
+    def test_correct_context(self):
+        response = self.authorized_client.get(reverse('posts:post_create'))
+        form_fields = {
+            'text': forms.fields.CharField,
+            'group': forms.fields.ChoiceField,
+        }
 
-#        for value, expected in form_fields.items():
-#            with self.subTest(value=value):
-#                form_field = response.context.get('form').fields.get(value)
-#                self.assertIsInstance(form_field, expected)
+        for value, expected in form_fields.items():
+            with self.subTest(value=value):
+                form_field = response.context.get('form').fields.get(value)
+                self.assertIsInstance(form_field, expected)
 
     def test_posts_list_page_show_correct_context(self):
         cache.clear()
@@ -119,17 +119,6 @@ class PostPagesTests(TestCase):
         self.assertEqual(first_object.group.title,
                          'Тестовое название группы',
                          f'post неверно передается в {response}')
-
-#    def test_posts_correct_context_post_edit(self):
-#        response = self.authorized_client.get(
-#            reverse('posts:edit', kwargs={'post_id': self.post.id}))
-#        first_object = response.context['post']
-#        self.assertEqual(first_object.text,
-#                         'Тестовый пост',
-#                         f'post неверно передается в {response}')
-#        self.assertEqual(first_object.group.title,
-#                         'Тестовое название группы',
-#                         f'post неверно передается в {response}')
 
     def checking_context(self, expect_answer):
         """Проверка контекста страниц"""
