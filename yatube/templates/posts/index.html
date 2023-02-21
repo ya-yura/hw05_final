@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<title>
+  {% block title %}Последние обновления на сайте{% endblock %}
+</title>
+<h1>Это главная страница проекта Yatube</h1>
+<hr>
+
+{% include 'posts/includes/switcher.html' %}
+{% load cache %}
+{% cache 20 index_page request.user.username %}
+  {% for post in page_obj %}
+    {% include 'posts/includes/article.html' with show_group=True %}
+      <br>
+      {% empty %}
+      <p>Нет Постов</p>
+  {% endfor %}
+{% endcache %}     
+{% include 'posts/includes/paginator.html' %}
+{% endblock %}
