@@ -1,6 +1,9 @@
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 
 from ..models import Group, Post, User
+
+User = get_user_model()
 
 
 class PostModelTest(TestCase):
@@ -15,30 +18,42 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовый пост',
+            text='Тестовая пост',
         )
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
+        post = self.post
+        group = self.group
         expected_str = {
-            self.post: self.post.text[:15],
-            self.group: self.group.title,
+            post: post.text[:15],
+            group: group.title
         }
-        for model, expected_value in expected_str.items():
+        for model, expected in expected_str.items():
             with self.subTest(model=model):
-                self.assertEqual(expected_value, str(model))
+                self.assertEqual(str(model), expected)
 
-    def test_models_have_correct_verbose_names(self):
-        """Проверяем, что у моделей корректные verbose_name."""
-        field_verbose_names = {
-            'text': 'Текст',
+    def test_field_verboses(self):
+        """Проверка verbose names."""
+        post = self.post
+        field_verboses = {
+            'text': 'Текст поста',
             'pub_date': 'Дата публикации',
-            'author': 'Автор',
             'group': 'Группа',
         }
-        for field, expected_value in field_verbose_names.items():
+        for field, expected in field_verboses.items():
             with self.subTest(field=field):
                 self.assertEqual(
-                    self.post._meta.get_field(field).verbose_name,
-                    expected_value,
-                )
+                    post._meta.get_field(field).verbose_name, expected)
+
+    def test_help_text(self):
+        """Проверка help_text."""
+        post = self.post
+        field_help_texts = {
+            'group': 'Выберите группу для новой записи',
+            'text': 'Текст поста',
+        }
+        for field, expected in field_help_texts.items():
+            with self.subTest(field=field):
+                self.assertEqual(
+                    post._meta.get_field(field).help_text, expected)
