@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.core.cache import cache
 from django.contrib.auth import get_user_model
 
-from ..models import Group, Post, User, Follow
+from ..models import Group, Post, User
 
 
 User = get_user_model()
