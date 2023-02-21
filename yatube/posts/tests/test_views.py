@@ -64,7 +64,7 @@ class PostPagesTests(TestCase):
             reverse('posts:index'): 'posts/index.html',
             reverse('posts:post_create'): 'posts/create_post.html',
             reverse(
-                'posts:group_list', kwargs={'slug': f'{self.group.slug}'}
+                'posts:group_posts', kwargs={'slug': f'{self.group.slug}'}
             ): 'posts/group_list.html',
             reverse(
                 'posts:profile', kwargs={'username': f'{self.author.username}'}
