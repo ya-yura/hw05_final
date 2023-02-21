@@ -81,7 +81,7 @@ class PostURLTests(TestCase):
     def test_url_avaliable_to_auth_for_edit(self):
         """Редактирование доступно авторизованному пользователю."""
         response = self.authorized_client.get(reverse(
-            'posts:edit', kwargs={'post_id': self.post.id})
+            'posts:post_edit', kwargs={'post_id': self.post.id})
         )
         self.assertEqual(response.status_code, 200)
 
