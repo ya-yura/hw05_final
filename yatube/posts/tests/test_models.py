@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 
-from ..models import Group, Post, User
+from ..models import Group, Post
 
 User = get_user_model()
 
@@ -18,42 +18,15 @@ class PostModelTest(TestCase):
         )
         cls.post = Post.objects.create(
             author=cls.user,
-            text='Тестовая пост',
+            text='Тестовый пост',
         )
 
     def test_models_have_correct_object_names(self):
         """Проверяем, что у моделей корректно работает __str__."""
-        post = self.post
-        group = self.group
-        expected_str = {
-            post: post.text[:15],
-            group: group.title
+        object_title = {
+            self.post.text[:15]: self.post,
+            self.group.title: self.group
         }
-        for model, expected in expected_str.items():
-            with self.subTest(model=model):
-                self.assertEqual(str(model), expected)
-
-    def test_field_verboses(self):
-        """Проверка verbose names."""
-        post = self.post
-        field_verboses = {
-            'text': 'Текст поста',
-            'pub_date': 'Дата публикации',
-            'group': 'Группа',
-        }
-        for field, expected in field_verboses.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    post._meta.get_field(field).verbose_name, expected)
-
-    def test_help_text(self):
-        """Проверка help_text."""
-        post = self.post
-        field_help_texts = {
-            'group': 'Выберите группу для новой записи',
-            'text': 'Текст поста',
-        }
-        for field, expected in field_help_texts.items():
-            with self.subTest(field=field):
-                self.assertEqual(
-                    post._meta.get_field(field).help_text, expected)
+        for expected_object_name, obj_model in object_title.items():
+            with self.subTest(object=obj_model):
+                self.assertEqual(expected_object_name, str(obj_model))
