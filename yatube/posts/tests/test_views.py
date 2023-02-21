@@ -69,9 +69,9 @@ class PostPagesTests(TestCase):
             reverse(
                 'posts:profile', kwargs={'username': f'{self.author.username}'}
             ): 'posts/profile.html',
-            # reverse(
-            #     'posts:post_detail', kwargs={'post_id': f'{self.post.id}'}
-            # ): 'posts/post_detail.html',
+            reverse(
+                'posts:post_detail', kwargs={'post_id': f'{self.post.id}'}
+            ): 'posts/post_detail.html',
             # reverse(
             #     'posts:edit', kwargs={'post_id': f'{self.post.id}'}
             # ): 'posts/create_post.html',
