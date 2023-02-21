@@ -53,7 +53,7 @@ class PostURLTests(TestCase):
         url_address = [
             '/',
             f'/group/{self.group.slug}/',
-            # f'/profile/{self.author.username}/',
+            f'/profile/{self.author.username}/',
             # f'/posts/{self.post.id}/',
         ]
         for client in self.clients:
