@@ -5,7 +5,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client, override_settings
-from django import forms
+# from django import forms
 from posts.models import Group, Post, Follow
 from django.conf import settings
 from django.core.cache import cache
