@@ -37,7 +37,7 @@ def profile(request, username):
     posts = author.posts.select_related('group')
     page_obj = utils.paginator(request=request, post=posts)
     following = (
-        request.user.is_authenticated 
+        request.user.is_authenticated
         and author.following.filter(user=request.user).exists()
     )
     if request.user.is_authenticated:
