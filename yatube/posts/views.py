@@ -40,11 +40,6 @@ def profile(request, username):
         request.user.is_authenticated
         and author.following.filter(user=request.user).exists()
     )
-    if request.user.is_authenticated:
-        following = Follow.objects.filter(
-            user=request.user,
-            author=author
-        ).exists()
     context = {
         'author': author,
         'page_obj': page_obj,
